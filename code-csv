@@ -1,0 +1,62 @@
+import findspark
+findspark.init(r'C:/Users/mdsha/Desktop/pyspark/spark-3.1.2-bin-hadoop3.2')
+# findspark.init('C:\MyStuff\Spark\spark-2.2.2-bin-hadoop2.7')
+# C:\MyStuff\Spark\spark-3.1.2-bin-hadoop3.2
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+from IPython.display import display
+
+spark = SparkSession \
+    .builder \
+    .master('local') \
+    .appName("Understanding CSV") \
+    .getOrCreate()
+
+# vaccinationsDF = spark\
+#                     .read\
+#                     .format("csv")\
+#                     .option("header", "true")\
+#                     .option("inferSchema", "true")\
+#                     .load("C:/Users/mdsha/Desktop/pyspark/Datasets/covid/country_vaccinations.csv")
+#
+# vaccinationsDF.show(2,False,True)
+
+# vaccinationsDF.show(100,False)
+#vaccinationsDF.show(10,False,True)
+
+# show is an action which is used to display the records in Dataframe
+# Its takes below arguments
+# 1) How many records to show (default:20)
+# 2) Truncate the record length(Default: True)
+# 3) Verticel View(Default: False)
+
+# Note: This code works only in jupyter Notebook
+from IPython.display import display
+# spark.conf.set("spark.sql.repl.eagerEval.enabled", True)
+# spark.conf.set("spark.sql.repl.eagerEval.maxNumRows",10)
+# vaccinationsDF
+
+# spark.sql.repl.eagerEval.enabled configuration for the eager evaluation of PySpark DataFrame in notebooks such as Jupyter.
+spark.conf.set("spark.sql.repl.eagerEval.enabled", True)
+# vaccinationsDF
+
+# When reading CSV files with a specified schema, it is possible that the data in the files does not match the schema. For example, a field containing name of the city will not parse as an integer. The consequences depend on the mode that the parser runs in:
+#
+# PERMISSIVE (default): nulls are inserted for fields that could not be parsed correctly[null\NA will be filled in unfilled]
+# DROPMALFORMED: drops lines that contain fields that could not be parsed[all null is rejected]
+# FAILFAST: aborts the reading if any malformed data is found[no null is accepted]
+
+vaccinationsDF = spark\
+                    .read\
+                    .format("csv")\
+                    .option("header", "true")\
+                    .option("inferSchema", "true")\
+                    .option("mode", "PERMISSIVE")\
+                    .load("C:/Users/mdsha/Desktop/pyspark/Datasets/covid/country_vaccinations.csv")
+
+# vaccinationsDF.show(10,False,False)
+
+vaccinationsDF.where('country="Ecuador"').show(20,False,False)
+
+vaccinationsDF.createTempView('eqador_data')
